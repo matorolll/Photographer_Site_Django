@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 
 def index(response):
-    return HttpResponse("aa")
+    return render(response, "main/base.html", {})
 
 def home(response):
-    return HttpResponse("home")
+    return render(response, "main/home.html", {})
