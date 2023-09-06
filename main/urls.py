@@ -23,6 +23,7 @@ urlpatterns = [
 
 
     path("control_panel/", views.control_panel, name="control_panel"),
+    path("control_panel/create_session/", views.create_session, name="create_session"),
 
 
     path('', include("django.contrib.auth.urls")),

@@ -47,6 +47,12 @@ def log_out(request):
     
     return render(request, 'registration/logout.html', {})
 
+
+
 @user_passes_test(lambda user: user.is_superuser)
 def control_panel(request):
-    return render(request, 'main/control_panel.html', {})
+    return render(request, 'main/control_panel/control_panel.html', {})
+
+@user_passes_test(lambda user: user.is_superuser)
+def create_session(request):
+    return render(request, 'main/control_panel/create_session.html', {})
