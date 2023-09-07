@@ -1,0 +1,17 @@
+{% extends 'main/base.html' %}
+{% block title %}
+    View session
+{% endblock %}
+
+
+
+{% block content %}
+{% if user.is_superuser %}
+    <div>View session</div>  
+
+    {% for session in sessions %}
+        <a href="{% url 'view_session' session.name %}">{{session.name}}</a>, password : {{session.password}}</br>
+    {% endfor %}
+
+{% endif %}
+{% endblock %}

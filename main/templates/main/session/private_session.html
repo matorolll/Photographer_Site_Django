@@ -1,0 +1,9 @@
+{% extends 'main/session/session_template.html' %}
+{% block title %} {{session.name}} {% endblock %}
+
+
+
+{% block content %}
+    {{session.name}}
+    {{session.password}}
+{% endblock %}

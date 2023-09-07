@@ -1,6 +1,5 @@
 from django.urls import path, include
 from . import views
-
 urlpatterns = [
     path("", views.index, name="index"),
     path("home/", views.home, name="home"),
@@ -24,6 +23,14 @@ urlpatterns = [
 
     path("control_panel/", views.control_panel, name="control_panel"),
     path("control_panel/create_session/", views.create_session, name="create_session"),
+    path("control_panel/view_sessions/", views.view_sessions, name="view_sessions"),
+    path("control_panel/delete_sessions/", views.delete_sessions, name="delete_sessions"),
+    path("control_panel/delete_session/<str:name>", views.delete_session, name="delete_session"),
+
+    path("add_picture/", views.add_picture, name="add_picture"),
+
+
+    path('session/<str:name>/', views.view_session, name='view_session'),
 
 
     path('', include("django.contrib.auth.urls")),

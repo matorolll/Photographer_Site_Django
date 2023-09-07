@@ -8,6 +8,10 @@
 {% block content %}
 {% if user.is_superuser %}
     <div>Create session</div>  
-
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Utwórz podstronę</button>
+    </form>
 {% endif %}
 {% endblock %}
