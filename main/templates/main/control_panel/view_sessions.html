@@ -7,11 +7,27 @@
 
 {% block content %}
 {% if user.is_superuser %}
-    <div>View session</div>  
-
+<div class="m-3">
+    <div class="card text-center">Sessions</div>
     {% for session in sessions %}
-        <a href="{% url 'view_session' session.name %}">{{session.name}}</a>, password : {{session.password}}</br>
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-9">
+                        <h5 class="card-title">Name: <a href="{% url 'view_session' session.name %}">{{ session.name }}</a> </h5>
+                        <h5 class="card-title">Password: {{ session.password }}</h5>
+                        <h5 class="card-title">Number of photos in sessions {{ session.photo_set.all.count }}</h5>
+                        <h5 class="card-title">Size of all photos in this session {{session.photos_size_in_session}} KB</h5>
+                        <p class="card-text">
+                            {% for photo in session.photo_set.all %}
+                                <img src="{{ photo.image.url}}" alt="connect" style="max-height:50px">
+                            {% endfor %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
     {% endfor %}
-
+</div>
 {% endif %}
 {% endblock %}

@@ -11,3 +11,9 @@ class Session(models.Model):
 class Photo(models.Model):
     title = models.CharField(max_length=255)
     image = models.ImageField(upload_to='photos/')
+    session = models.ForeignKey(Session, on_delete=models.CASCADE,null=True)
+    selected_to_edit = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.title
+    

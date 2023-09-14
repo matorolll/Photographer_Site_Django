@@ -27,10 +27,14 @@ urlpatterns = [
     path("control_panel/delete_sessions/", views.delete_sessions, name="delete_sessions"),
     path("control_panel/delete_session/<str:name>", views.delete_session, name="delete_session"),
 
-    path("add_picture/", views.add_picture, name="add_picture"),
+    path("control_panel/photos_sessions/", views.photos_sessions, name="photos_sessions"),
+
+
 
 
     path('session/<str:name>/', views.view_session, name='view_session'),
+    path('update_photo_select/<int:photo_id>/', views.update_photo_select, name='update_photo_select'),
+    path('update_photo_select_multiple/', views.update_photo_select_multiple, name='update_photo_select_multiple'),
 
 
     path('', include("django.contrib.auth.urls")),

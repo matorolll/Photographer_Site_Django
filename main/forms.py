@@ -32,5 +32,7 @@ class PrivateSessionForm(forms.Form):
 class PhotoForm(forms.ModelForm):
     class Meta:
         model = Photo
-        fields = ['title', 'image']
-    
+        fields = ['title', 'image', 'session']
+        widgets = {
+            'image': forms.ClearableFileInput(attrs={"allow_multiple_selected": True}),
+        }

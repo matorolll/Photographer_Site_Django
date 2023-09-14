@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     "crispy_forms",
     "crispy_bootstrap4",
     'main',
+    #"django_bootstrap5",
+
+
 ]
 
 MIDDLEWARE = [
@@ -133,3 +136,5 @@ LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
 MEDIA_URL = 'media/'
+import os
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')

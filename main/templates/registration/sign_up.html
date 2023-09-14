@@ -10,7 +10,6 @@
     You are currently signed up, logout to register new account
     <a href="/logout"><button class="btn btn-primary btn-block mb-4 mt-5">Logout</button></a>
 {% else %}
-    <a href="/logout"><button class="btn btn-primary btn-block mb-4 mt-5">Logout</button></a>
     <form method="POST" class="form-group">
         {% csrf_token %}
         {{ form|crispy }}
