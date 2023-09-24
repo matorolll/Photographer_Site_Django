@@ -8,7 +8,8 @@ from .models import Session
 from .forms import PrivateSessionForm
 from .forms import PhotoForm
 from .models import Photo
-
+import os
+from django.conf import settings
 
 def index(request):
     return render(request, 'main/base.html', {})
@@ -95,7 +96,7 @@ def view_sessions(request):
         photos = session.photo_set.all()
         photos_size = []
         for photo in photos:
-            photos_size.append(photo.image.size / 1024)
+            photos_size.append(photo.image.size / (1024*1024))
         photos_size_in_session = round(sum(photos_size))
         session.photos_size_in_session = photos_size_in_session
 
@@ -103,23 +104,22 @@ def view_sessions(request):
 
 
 
-
+"""
 def view_session(request, name):
     session = get_object_or_404(Session, name=name)
     photos = session.photo_set.all()
 
     if request.user.is_superuser:
         return render(request, 'main/session/private_session.html', {'session': session, 'photos':photos})
-
-
 """
+
+
 def view_session(request, name):
     session = get_object_or_404(Session, name=name)
     photos = session.photo_set.all()
-
     photos_size = []
     for photo in photos:
-        photos_size.append(photo.image.size/(1024))
+        photos_size.append(photo.image.size/(1024*1024))
     photos_size_in_session = round(sum(photos_size))
 
     if request.user.is_superuser:
@@ -137,7 +137,7 @@ def view_session(request, name):
     
     return render(request, 'main/session/private_session_form.html', {'form': form})
 
-"""
+
 
 
 
@@ -151,24 +151,24 @@ def photos_sessions(request):
     if request.method == 'POST':
 
         if 'clear_session' in request.POST:
-            session =  request.POST['session']
-            dropped_photo = Photo.objects.filter(session=session)
-            import os
-            from django.conf import settings
+            session_id =  request.POST['session']
+            dropped_photo = Photo.objects.filter(session_id=session_id)
             for photo in dropped_photo:
-                file_path = os.path.join(settings.MEDIA_ROOT, str(photo.image))
-                if os.path.exists(file_path):
-                    os.remove(file_path)
                 photo.delete()
 
         if 'delete_session' in request.POST:
-            name =  request.POST['session']
-            session = Session.objects.filter(name=name).delete()
+            session_id =  request.POST['session']
+
+            dropped_photo = Photo.objects.filter(session_id=session_id)
+            for photo in dropped_photo:
+                photo.delete()
+                
+            Session.objects.filter(id=session_id).delete()
 
         
 
         if 'add_images_session' in request.POST:
-            from PIL import Image
+            from PIL import Image, ImageDraw, ImageFont
             from io import BytesIO
             from django.core.files import File
 
@@ -181,15 +181,48 @@ def photos_sessions(request):
                     if image_type == 'original':
                         photo = Photo(title=image.name, image=image, session=form.cleaned_data['session'])
                         photo.save()
+
                     elif image_type == 'resized':
+
                         img = Image.open(image)
-                        img.thumbnail((img.width // 4, img.height // 4))  # Pomniejszenie do 1/4 rozmiaru
+                        img.thumbnail((img.width, img.height))
+                        text = "moccastudio"
+                        opacity = 60
+                        grid = 5
+
+                        img_width, img_height = img.size
+                        text_size = img_width//32
+                        font = ImageFont.truetype("arial.ttf", text_size)
+                        text_color = (255, 255, 255, opacity)
+
+
+                        cell_width = img_width // grid
+                        cell_height = img_height // grid
+                        for i in range(grid**2):
+                            row = i // grid
+                            col = i % grid
+                            x = col * cell_width + cell_width // 2 - cell_width // 3
+                            y = row * cell_height + cell_height // 2 
+
+                            text_image = Image.new('RGBA', (cell_width, cell_height), (255, 255, 255, 0))
+                            text_draw = ImageDraw.Draw(text_image)
+                            text_draw.text((cell_width // 2, cell_height // 2), text, fill=text_color, font=font, anchor="mm")
+                            rotated_text = text_image.rotate(45, expand=True)
+                            img.paste(rotated_text, (x - cell_width // 2, y - cell_height // 2), rotated_text)
+
                         output_io = BytesIO()
                         img.save(output_io, format='JPEG') 
                         output_io.seek(0)
+                    
 
-                        photo = Photo(title=form.cleaned_data['title'], image=File(output_io, name=image.name), session=form.cleaned_data['session'])
+                        photo = Photo(title=image.name, image=File(output_io, name=image.name), session=form.cleaned_data['session'])
                         photo.save()
+
+
+
+
+
+
 
                 img_obj = form.instance
                 return render(request, 'main/control_panel/photos_sessions.html', {'form': form, 'img_obj': img_obj, 'sessions':sessions})
