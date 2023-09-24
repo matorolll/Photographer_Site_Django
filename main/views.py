@@ -19,8 +19,6 @@ import json
 
 
 
-
-
 def index(request):
     return render(request, 'main/base.html', {})
 
@@ -33,7 +31,6 @@ def portfolio(request):
 def pricing(request):
     return render(request, 'main/pricing.html', {})
 
-
 def weddingSession(request):
     return render(request, 'main/session/wedding.html', {})
 def newbornSession(request):
@@ -43,7 +40,6 @@ def familySession(request):
 
 def profile(request):
     return render(request, 'main/profile.html', {})
-
 
 def sign_up(request):
     if request.method == 'POST':
@@ -57,12 +53,10 @@ def sign_up(request):
 
     return render(request, 'registration/sign_up.html', {'form':form})
 
-
 def log_out(request):
     if request.method == 'POST':
         logout(request)
         return redirect('/home')
-    
     return render(request, 'registration/logout.html', {})
 
 
@@ -175,40 +169,8 @@ def photos_sessions(request):
                             photo.save()
 
                         elif image_type == 'resized':
+                            create_watermarked_photo(image, form.cleaned_data['session'])
 
-                            img = Image.open(image)
-                            img.thumbnail((img.width, img.height))
-                            text = "moccastudio"
-                            opacity = 60
-                            grid = 5
-
-                            img_width, img_height = img.size
-                            text_size = img_width//32
-                            font = ImageFont.truetype("arial.ttf", text_size)
-                            text_color = (255, 255, 255, opacity)
-
-
-                            cell_width = img_width // grid
-                            cell_height = img_height // grid
-                            for i in range(grid**2):
-                                row = i // grid
-                                col = i % grid
-                                x = col * cell_width + cell_width // 2 - cell_width // 3
-                                y = row * cell_height + cell_height // 2 
-
-                                text_image = Image.new('RGBA', (cell_width, cell_height), (255, 255, 255, 0))
-                                text_draw = ImageDraw.Draw(text_image)
-                                text_draw.text((cell_width // 2, cell_height // 2), text, fill=text_color, font=font, anchor="mm")
-                                rotated_text = text_image.rotate(45, expand=True)
-                                img.paste(rotated_text, (x - cell_width // 2, y - cell_height // 2), rotated_text)
-
-                            output_io = BytesIO()
-                            img.save(output_io, format='JPEG') 
-                            output_io.seek(0)
-                        
-
-                            photo = Photo(title=image.name, image=File(output_io, name=image.name), session=form.cleaned_data['session'])
-                            photo.save()
 
                     except Exception as e:
                         form.add_error('image',str(e))
@@ -219,11 +181,8 @@ def photos_sessions(request):
     else:
         form = PhotoForm()
 
-
     photos = Photo.objects.all()
     return render(request, 'main/control_panel/photos_sessions.html', {'sessions': sessions, 'photos': photos})
-
-
 
 
 def update_photo_select(request, photo_id):
@@ -248,3 +207,37 @@ def update_photo_select_multiple(request):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
     return JsonResponse({'message': 'Method not allowed'}, status=405)
+
+
+def create_watermarked_photo(image, session):
+    img = Image.open(image)
+    img.thumbnail((img.width, img.height))
+    text = "moccastudio"
+    opacity = 60
+    grid = 5
+
+    img_width, img_height = img.size
+    text_size = img_width // 32
+    font = ImageFont.truetype("arial.ttf", text_size)
+    text_color = (255, 255, 255, opacity)
+
+    cell_width = img_width // grid
+    cell_height = img_height // grid
+    for i in range(grid**2):
+        row = i // grid
+        col = i % grid
+        x = col * cell_width + cell_width // 2 - cell_width // 3
+        y = row * cell_height + cell_height // 2 
+
+        text_image = Image.new('RGBA', (cell_width, cell_height), (255, 255, 255, 0))
+        text_draw = ImageDraw.Draw(text_image)
+        text_draw.text((cell_width // 2, cell_height // 2), text, fill=text_color, font=font, anchor="mm")
+        rotated_text = text_image.rotate(45, expand=True)
+        img.paste(rotated_text, (x - cell_width // 2, y - cell_height // 2), rotated_text)
+
+    output_io = BytesIO()
+    img.save(output_io, format='JPEG') 
+    output_io.seek(0)
+
+    photo = Photo(title=image.name, image=File(output_io, name=image.name), session=session)
+    photo.save()

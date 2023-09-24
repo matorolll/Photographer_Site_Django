@@ -3,6 +3,9 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import Session
 from .models import Photo
+from django.core.exceptions import ValidationError
+from PIL import Image
+
 
 class SignupForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -36,3 +39,18 @@ class PhotoForm(forms.ModelForm):
         widgets = {
             'image': forms.ClearableFileInput(attrs={"allow_multiple_selected": True}),
         }
+
+    #def clean_image(self):
+    #    image = self.cleaned_data.get('image')
+
+    #    if image:
+    #        if not image.name.endswith('.jpg') and not image.name.endswith('.jpeg') and not image.name.endswith('.JPG'):
+    #            raise ValidationError('Picture need to be in JPEG.')
+    #        try:
+    #            img = Image.open(image)
+    #            if img.format.lower() != 'jpeg':
+    #                raise ValidationError('This is not JPEG.')
+    #        except Exception as e:
+    #            raise ValidationError('Cannot open file as JPEG.')
+
+    #    return image
