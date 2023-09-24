@@ -53,7 +53,7 @@
                 <form method="post">
                     {% csrf_token %}
                     <div class="card-body">
-                    <h5 class="card-title">Delete image from session</h5>
+                    <h5 class="card-title">Clear image from session</h5>
                     <p class="card-text">
                         <label for="id_session">Session:</label>
                         <select name="session" id="id_session">
@@ -74,12 +74,12 @@
                 <form method="post">
                     {% csrf_token %}
                     <div class="card-body">
-                    <h5 class="card-title">Delete image from session</h5>
+                    <h5 class="card-title">Delete entire session</h5>
                     <p class="card-text">
                         <label for="id_session">Session:</label>
                         <select name="session" id="id_session">
                             {% for session in sessions %}
-                                <option value="{{ session.name }}">{{ session.name }}</option>
+                                <option value="{{ session.id }}">{{ session.name }}</option>
                             {% endfor %}
                         </select>
                     </p>
@@ -102,7 +102,11 @@
                             <h5 class="card-title">{{ session.name }}</h5>
                             <p class="card-text">
                                 {% for photo in session.photo_set.all %}
-                                <img src="{{ photo.image.url}}" alt="connect" style="max-height:50px">
+                                    {% if forloop.counter <= 9 %}
+                                        <img src="{{ photo.thumbnail.url }}" alt="connect" style="max-height: 100px">
+                                    {% elif forloop.counter == 10 %}
+                                        <span>+{{ session.photo_set.all.count|add:"-9" }} ...</span>
+                                    {% endif %}
                                 {% endfor %}
                             </p>
                         </div>
@@ -116,7 +120,7 @@
 
                             <form method="post">
                                 {% csrf_token %}
-                                <input type="hidden" name="session" value="{{ session.name }}">
+                                <input type="hidden" name="session" value="{{ session.id }}">
                                 <button type="submit" name="delete_session" class="btn btn-danger">Delete</button>
                             </form>
                         </div>

@@ -17,10 +17,14 @@
                         <h5 class="card-title">Name: <a href="{% url 'view_session' session.name %}">{{ session.name }}</a> </h5>
                         <h5 class="card-title">Password: {{ session.password }}</h5>
                         <h5 class="card-title">Number of photos in sessions {{ session.photo_set.all.count }}</h5>
-                        <h5 class="card-title">Size of all photos in this session {{session.photos_size_in_session}} KB</h5>
+                        <h5 class="card-title">Size of all photos in this session {{session.photos_size_in_session}} MB</h5>
                         <p class="card-text">
                             {% for photo in session.photo_set.all %}
-                                <img src="{{ photo.image.url}}" alt="connect" style="max-height:50px">
+                                {% if forloop.counter <= 9 %}
+                                    <img src="{{ photo.thumbnail.url }}" alt="connect" style="max-height: 100px">
+                                {% elif forloop.counter == 10 %}
+                                    <span>+{{ session.photo_set.all.count|add:"-9" }} ...</span>
+                                {% endif %}
                             {% endfor %}
                         </p>
                     </div>
