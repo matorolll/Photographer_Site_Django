@@ -80,20 +80,40 @@
     const GalleryEffects = () => {
       const images = document.querySelectorAll('img');
       const clearButton = document.getElementById('clearButton')
-    
+
       clearButton.addEventListener('click', () =>{
         images.forEach((image) => {
-            image.classList.remove('selected');
+            //image.classList.remove('selected');  border color
+
+            //with checking
+            //const heartIcon = image.nextElementSibling;
+            //if (heartIcon && heartIcon.classList.contains('like-icon')) {
+            //    heartIcon.classList.remove('clicked');
+            //}
+            image.nextElementSibling.classList.remove('clicked');
         });
         saveToDb(images);
       });
 
-
       images.forEach((image) => {
+        const heartIcon = image.nextElementSibling;
+        if (heartIcon && heartIcon.classList.contains('like-icon')) {
+            heartIcon.addEventListener('contextmenu', () => {
+                event.preventDefault();
+                heartIcon.classList.toggle('clicked');
+                saveToDb(image)
+        })};
+
         if (image.getAttribute('data-selected')=== 'True') {
-            image.classList.add('selected');
+            heartIcon.classList.toggle('clicked');
         }
     
+        image.addEventListener('contextmenu', () => {
+            event.preventDefault();
+            heartIcon.classList.toggle('clicked');
+            saveToDb(image)
+        });
+
         image.addEventListener('mouseover', () => {
             image.classList.add('onhover-effect');
         });
@@ -101,46 +121,48 @@
         image.addEventListener('mouseout', () => {
             image.classList.remove('onhover-effect');
         });
-    
-        image.addEventListener('contextmenu', () => {
-            event.preventDefault();
-            image.classList.toggle('selected');
-            saveToDb(image)
-        });
       });
       updateCounter(); //update onstart
     }
-
     window.addEventListener('load', GalleryEffects);
-
-
-
-
 </script>
 
 
 <style>
     .onhover-effect {
-    opacity: 0.7;
-}
-    .selected {
-        border: 5px solid rgb(62, 203, 62);
+    opacity: 0.8;
     }
+
+    .selected { border: 5px solid rgb(62, 203, 62);  }
 
     img{
         width: 40vmin;
         height: 56vmin;
         object-fit:cover;
         object-position:center;
-
     }
 
+    .photo-container {
+    position: relative;
+    display: inline-block;
+    }
+
+    .like-icon {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        color: gray; 
+        cursor: pointer;
+        font-size: 30px;
+    }
+
+    .like-icon.clicked {
+        color: red;
+    }
 </style>
 
 <div id="selectedCounter">Selected: </div>
 <button id="clearButton">Clear images</button>
-
-
 
 <section class="gallery min-vh-100">
     <div class="container-lg">
@@ -149,11 +171,13 @@
 
             {% for photo in photos %}
                 <a href="{{photo.thumbnail_medium.url}}" data-lightbox="lightbox" data-title="{{photo.title}}"
-                     data-gallery="photo_gallery" data-photo-id="{{ photo.id }}">
+                     data-gallery="photo_gallery" data-photo-id="{{ photo.id }}" class="photo-container"> 
                      <!--data-alt="{{ photo.id }}"-->
                     
                     <img src="{{photo.thumbnail_medium.url}}" class=" shadow-1-strong rounded" loading="lazy"
                     alt="{{ photo.id }}" data-selected="{{ photo.selected_to_edit }}"/>
+                    <i class="fas fa-heart like-icon" data-photo-id="{{ photo.id }}"></i>
+
                 </a>
             {% endfor %}
         </div>
