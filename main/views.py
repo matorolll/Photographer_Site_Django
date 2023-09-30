@@ -20,26 +20,34 @@ import json
 
 
 def index(request):
-    return render(request, 'main/base.html', {})
+    context = {}
+    return render(request, 'main/base.html', context)
 
 def home(request):
-    return render(request, 'main/home.html', {})
+    context = {}
+    return render(request, 'main/home.html', context)
 
 def portfolio(request):
-    return render(request, 'main/portfolio.html', {})
+    context = {}
+    return render(request, 'main/portfolio.html', context)
 
 def pricing(request):
-    return render(request, 'main/pricing.html', {})
+    context = {}
+    return render(request, 'main/pricing.html', context)
 
 def weddingSession(request):
-    return render(request, 'main/session/wedding.html', {})
+    context = {}
+    return render(request, 'main/session/wedding.html', context)
 def newbornSession(request):
-    return render(request, 'main/session/newborn.html', {})
+    context = {}
+    return render(request, 'main/session/newborn.html', context)
 def familySession(request):
-    return render(request, 'main/session/family.html', {})
+    context = {}
+    return render(request, 'main/session/family.html', context)
 
 def profile(request):
-    return render(request, 'main/profile.html', {})
+    context = {}
+    return render(request, 'main/profile.html', context)
 
 def sign_up(request):
     if request.method == 'POST':
@@ -48,22 +56,23 @@ def sign_up(request):
             user = form.save()
             login(request, user)
             return redirect('/home')
-    else:
-        form = SignupForm()
-
-    return render(request, 'registration/sign_up.html', {'form':form})
+    else: form = SignupForm()
+    context = {'form':form}
+    return render(request, 'registration/sign_up.html', context)
 
 def log_out(request):
     if request.method == 'POST':
         logout(request)
         return redirect('/home')
-    return render(request, 'registration/logout.html', {})
+    context = {}
+    return render(request, 'registration/logout.html', context)
 
 
 
 @user_passes_test(lambda user: user.is_superuser)
 def control_panel(request):
-    return render(request, 'main/control_panel/control_panel.html', {})
+    context = {}
+    return render(request, 'main/control_panel/control_panel.html', context)
 
 @user_passes_test(lambda user: user.is_superuser)
 def create_session(request):
@@ -73,10 +82,9 @@ def create_session(request):
         if form.is_valid():
             session = form.save()
             return redirect('view_session', name=name)
-
-    else:
-        form = SessionForm()
-    return render(request, 'main/control_panel/create_session.html', {'form': form})
+    else: form = SessionForm()
+    context = {'form':form}
+    return render(request, 'main/control_panel/create_session.html', context)
 
 
 
@@ -84,12 +92,14 @@ def create_session(request):
 @user_passes_test(lambda user: user.is_superuser)
 def delete_sessions(request):
     sessions = Session.objects.all()
-    return render(request, 'main/control_panel/delete_sessions.html', {'sessions': sessions})
+    context = {'sessions': sessions}
+    return render(request, 'main/control_panel/delete_sessions.html', context)
 
 @user_passes_test(lambda user: user.is_superuser)
 def delete_session(request,name):
     session = Session.objects.filter(name=name).delete()
-    return render(request, 'main/session/session_template.html', {'session': session})
+    context = {'session': session}
+    return render(request, 'main/session/session_template.html', context)
 
 
 @user_passes_test(lambda user: user.is_superuser)
@@ -103,8 +113,8 @@ def view_sessions(request):
             photos_size.append(photo.image.size / (1024*1024))
         photos_size_in_session = round(sum(photos_size))
         session.photos_size_in_session = photos_size_in_session
-
-    return render(request, 'main/control_panel/view_sessions.html', {'sessions': sessions})
+    context = {'sessions': sessions}
+    return render(request, 'main/control_panel/view_sessions.html', context)
 
 
 def view_session(request, name):
