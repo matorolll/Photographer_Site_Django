@@ -36,6 +36,9 @@ urlpatterns = [
     path('update_photo_select/<int:photo_id>/', views.update_photo_select, name='update_photo_select'),
     path('update_photo_select_multiple/', views.update_photo_select_multiple, name='update_photo_select_multiple'),
 
+    path('download/<str:name>/', views.download_photos, name='download_photos'),
+
+
 
     path('', include("django.contrib.auth.urls")),
 ]

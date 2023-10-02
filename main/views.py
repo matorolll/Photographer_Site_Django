@@ -16,6 +16,7 @@ from django.core.files import File
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 import json
+import io
 
 
 
@@ -209,6 +210,33 @@ def update_photo_select(request, photo_id):
         photo.save()
         return JsonResponse({'status': 'ok'})
     
+
+import pyzipper
+def download_photos(request, name):
+    session = get_object_or_404(Session, name=name)
+    photos = session.photo_set.all()
+    print(session.password)
+
+    # Create an in-memory zip file
+    zip_buffer = io.BytesIO()
+
+    password = f"{session.password}"  # Replace 'your_password' with the desired password
+
+    with pyzipper.AESZipFile(zip_buffer, 'w', compression=pyzipper.ZIP_LZMA, encryption=pyzipper.WZ_AES) as zip_file:
+        zip_file.setpassword(password.encode())
+        for photo in photos:
+            zip_file.write(photo.image.path, arcname=photo.image.name)
+
+    # Move the buffer's cursor to the beginning
+    zip_buffer.seek(0)
+
+    # Create a response and set the appropriate headers for a zip file
+    response = HttpResponse(zip_buffer.read(), content_type='application/zip')
+    response['Content-Disposition'] = 'attachment; filename={}'.format(f"{name}_photos.zip")
+
+    return response
+
+
 
 def update_photo_select_multiple(request):
     if request.method == 'POST':
