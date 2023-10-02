@@ -121,28 +121,33 @@ def view_session(request, name):
     session = get_object_or_404(Session, name=name)
     photos = session.photo_set.all()
     photos_size = []
+    context = {}
     for photo in photos:
         photos_size.append(photo.image.size/(1024*1024))
     photos_size_in_session = round(sum(photos_size))
 
     if request.user.is_superuser:
-        return render(request, 'main/session/private_session.html', {'session': session, 'photos':photos, 'photos_size_in_session':photos_size_in_session})
+        context = {'session': session, 'photos':photos, 'photos_size_in_session':photos_size_in_session}
+        return render(request, 'main/session/private_session.html', context)
 
     if request.method == 'POST':
         form = PrivateSessionForm(request.POST)
         if form.is_valid():
             entered_password = form.cleaned_data['password']
             if entered_password == session.password:
-                return render(request, 'main/session/private_session.html', {'session': session, 'photos':photos})
+                context = {'session': session, 'photos':photos}
+                return render(request, 'main/session/private_session.html', context)
     
     else:
         form = PrivateSessionForm()
     
-    return render(request, 'main/session/private_session_form.html', {'form': form})
+    context = {'form': form}
+    return render(request, 'main/session/private_session_form.html', context)
 
 
 @user_passes_test(lambda user: user.is_superuser)
 def photos_sessions(request):
+    context = {}
     sessions = Session.objects.all()
 
     if request.method == 'POST':
@@ -186,13 +191,15 @@ def photos_sessions(request):
                         form.add_error('image',str(e))
 
                 img_obj = form.instance
-                return render(request, 'main/control_panel/photos_sessions.html', {'form': form, 'img_obj': img_obj, 'sessions':sessions})
+                context = {'form': form, 'img_obj': img_obj, 'sessions':sessions}
+                return render(request, 'main/control_panel/photos_sessions.html', context)
         
     else:
         form = PhotoForm()
 
     photos = Photo.objects.all()
-    return render(request, 'main/control_panel/photos_sessions.html', {'sessions': sessions, 'photos': photos})
+    context = {'sessions': sessions, 'photos': photos}
+    return render(request, 'main/control_panel/photos_sessions.html', context)
 
 
 def update_photo_select(request, photo_id):
