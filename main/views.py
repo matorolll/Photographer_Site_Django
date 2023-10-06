@@ -187,7 +187,8 @@ def photos_sessions(request):
                             photo.save()
 
                         elif image_type == 'resized':
-                            create_watermarked_photo(image, form.cleaned_data['session'])
+                            
+                            create_watermarked_photo(image, form.cleaned_data['session'], request.POST['watermark_opacity'])
 
 
                     except Exception as e:
@@ -246,11 +247,11 @@ def update_photo_select_multiple(request):
     return JsonResponse({'message': 'Method not allowed'}, status=405)
 
 
-def create_watermarked_photo(image, session):
+def create_watermarked_photo(image, session, watermark_opacity):
     img = Image.open(image)
     img.thumbnail((img.width, img.height))
     text = "moccastudio"
-    opacity = 60
+    opacity = int(watermark_opacity)
     grid = 5
 
     img_width, img_height = img.size
