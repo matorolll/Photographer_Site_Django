@@ -28,17 +28,25 @@ class Photo(models.Model):
             image = Image.open(self.image.path)
             thumbnail_size = (100, 100)
             image.thumbnail(thumbnail_size)
-            thumbnail_path = f"media/thumbnails/{self.image.name.split('/')[-1]}"
+
+            thumbnail_directory = "media/thumbnails/"
+            os.makedirs(thumbnail_directory, exist_ok=True)
+
+            thumbnail_path = f"{thumbnail_directory}{self.image.name.split('/')[-1]}"
             image.save(thumbnail_path)
-            self.thumbnail =  f"thumbnails/{self.image.name.split('/')[-1]}"
+            self.thumbnail = f"thumbnails/{self.image.name.split('/')[-1]}"
             super().save(*args, **kwargs)
 
         if not self.thumbnail_medium:
             image = Image.open(self.image.path)
             image.thumbnail((image.width // 7, image.height // 7))
-            thumbnail_path = f"media/thumbnails_medium/{self.image.name.split('/')[-1]}"
+
+            medium_thumbnail_directory = "media/thumbnails_medium/"
+            os.makedirs(medium_thumbnail_directory, exist_ok=True)
+
+            thumbnail_path = f"{medium_thumbnail_directory}{self.image.name.split('/')[-1]}"
             image.save(thumbnail_path)
-            self.thumbnail_medium =  f"thumbnails_medium/{self.image.name.split('/')[-1]}"
+            self.thumbnail_medium = f"thumbnails_medium/{self.image.name.split('/')[-1]}"
             super().save(*args, **kwargs)
 
 
