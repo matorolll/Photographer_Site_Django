@@ -164,7 +164,8 @@
 <div id="selectedCounter">Selected: </div>
 <button id="clearButton">Clear images</button>
 </br>
-<a href="{% url 'download_photos' name=session.name %}">Download all photos</a>
+<a href="{% url 'download_photos_zip' name=session.name %}">Download all photos to zip</a>
+<a href="{% url 'download_photos_folder' name=session.name%}">Download all photos to folder</a>
 
 <section class="gallery min-vh-100">
     <div class="container-lg">

@@ -214,10 +214,9 @@ def update_photo_select(request, photo_id):
         return JsonResponse({'status': 'ok'})
     
 
-def download_photos(request, name):
+def download_photos_zip(request, name):
     session = get_object_or_404(Session, name=name)
     photos = session.photo_set.all()
-    print(session.password)
     zip_buffer = io.BytesIO()
     password = f"{session.password}"
 
@@ -229,6 +228,30 @@ def download_photos(request, name):
     response = HttpResponse(zip_buffer.read(), content_type='application/zip')
     response['Content-Disposition'] = 'attachment; filename={}'.format(f"{name}_photos.zip")
     return response
+
+
+import zipfile
+def download_photos_folder(request, name):
+    session = get_object_or_404(Session, name=name)
+    photos = session.photo_set.all()
+    zip_buffer = io.BytesIO()
+
+    with zipfile.ZipFile(zip_buffer, 'w') as zip_file:
+        for photo in photos:
+            with open(photo.image.path, 'rb') as photo_file:
+                zip_file.writestr(photo.image.name, photo_file.read())
+
+    response = HttpResponse(zip_buffer.getvalue(), content_type='application/zip')
+    response['Content-Disposition'] = f'attachment; filename={name}_photos.zip'
+
+    return response
+
+
+
+
+
+
+
 
 
 def update_photo_select_multiple(request):
