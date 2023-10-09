@@ -175,8 +175,11 @@ def photos_sessions(request):
             if form.is_valid():
                 images = request.FILES.getlist('image')
                 image_type = request.POST.get('image_type')
+                uploaded_photos = []
 
                 for image in images:
+                    uploaded_photos.append('a')
+                    print(uploaded_photos)
                     try:
                         img = Image.open(image)
                         if img.format !='JPEG':
@@ -187,17 +190,14 @@ def photos_sessions(request):
                             photo.save()
 
                         elif image_type == 'resized':
-                            
                             create_watermarked_photo(image, form.cleaned_data['session'], request.POST['watermark_opacity'])
-
 
                     except Exception as e:
                         form.add_error('image',str(e))
 
                 img_obj = form.instance
-                context = {'form': form, 'img_obj': img_obj, 'sessions':sessions}
+                context = {'form': form, 'img_obj': img_obj, 'sessions':sessions,  'uploaded_photos': uploaded_photos}
                 return render(request, 'main/control_panel/photos_sessions.html', context)
-        
     else:
         form = PhotoForm()
 
@@ -245,10 +245,6 @@ def download_photos_folder(request, name):
     response['Content-Disposition'] = f'attachment; filename={name}_photos.zip'
 
     return response
-
-
-
-
 
 
 

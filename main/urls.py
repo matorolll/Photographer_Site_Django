@@ -40,5 +40,6 @@ urlpatterns = [
     path('download_to_file/<str:name>/', views.download_photos_folder, name='download_photos_folder'),
 
 
+
     path('', include("django.contrib.auth.urls")),
 ]
